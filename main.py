@@ -1,35 +1,56 @@
 import streamlit as st
+import base64
 
 
 button_dict = {
-    "Python Programming": ["Installation and Setup", "Variables"],
-    "SQL Basics": ["Tables", "Views"],
+    "Python Programming": {
+        "Introduction": "python_programming/Introduction.pdf",
+        "Control Flow Tools": "python_programming/Control_Flow_Tools.pdf"
+    },
+    "SQL Basics": {
+        "Tables": "",
+        "Views": ""
+    },
 }
 
 
-# Function to handle button clicks
-def handle_button_click(section, button):
-    st.session_state.button_clicked = f"{section} - {button}"
+# Function to display PDF in an iframe
+def display_pdf(file_path):
+    with open(file_path, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+    pdf_display = f'''
+    <style>
+        .pdf-container {{
+            display: flex;
+            justify-content: space-between;  /* Button on right, iframe on left */
+            align-items: flex-start;  /* Align both at the top */
+            margin-left: -29%;  /* Move iframe and button together to the left */
+            width: 200%;  /* Relative width for the entire container */
+        }}
+        iframe {{
+            width: 80%;  /* Relative width for the iframe */
+            height: 89vh;  /* Relative height: 89% of the viewport height */
+        }}
+    </style>
+    <div class="pdf-container">
+        <iframe src="data:application/pdf;base64,{base64_pdf}" type="application/pdf"></iframe>
+    </div>
+    '''
+    st.markdown(pdf_display, unsafe_allow_html=True)
 
-
-# Initialize session state to track clicked buttons
-if "button_clicked" not in st.session_state:
-    st.session_state.button_clicked = None
 
 # Sidebar with multiple expandable sections
 st.sidebar.title("Basic Data Engineering Journey")
 
 for section, buttons in button_dict.items():
     with st.sidebar.expander(section):
-        for button in buttons:
+        for button, file in buttons.items():
             if st.button(button):
-                handle_button_click(section, button)
+                st.session_state.selected_pdf = file  # Store the file path directly in session state
 
 # Main panel content - Dynamically display based on the clicked button
-st.title("Main Content")
-
-if st.session_state.button_clicked:
-    st.write(f"You clicked: {st.session_state.button_clicked}")
-    # Add more content for each button as needed
+if st.session_state.selected_pdf:
+    # Display the PDF in an iframe with relative sizing
+    display_pdf(st.session_state.selected_pdf)
 else:
     st.write("Please click a button from the sidebar.")
