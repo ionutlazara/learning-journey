@@ -1,0 +1,13 @@
+/* styles.css */
+.pdf-container {
+    display: flex;
+    justify-content: space-between;  /* Button on right, iframe on left */
+    align-items: flex-start;  /* Align both at the top */
+    margin-left: -29%;  /* Move iframe and button together to the left */
+    width: 200%;  /* Relative width for the entire container */
+}
+
+iframe {
+    width: 80%;  /* Relative width for the iframe */
+    height: 89vh;  /* Relative height: 89% of the viewport height */
+}
