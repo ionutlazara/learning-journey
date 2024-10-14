@@ -8,6 +8,8 @@ from jinja2 import Environment, FileSystemLoader
 # Initialize Jinja2 environment and load templates from the current directory
 env = Environment(loader=FileSystemLoader('./templates'))
 
+st.session_state.selected_pdf = None
+
 
 # Function to load and render HTML template using Jinja2
 def render_template(template_name: str, **context: Dict):
