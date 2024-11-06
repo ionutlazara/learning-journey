@@ -19,19 +19,20 @@ class PDFManager:
             print(f"Failed to connect to database: {e}")
             return None
 
-    def insert_pdf(self, section_name: str, button_name: str, pdf_data: bytes) -> bool:
+    def insert_pdf(self, section_name: str, button_name: str, pdf_data: bytes, file_type: str) -> bool:
         query = sa.text(f"""
-            INSERT INTO TRAINING_FILES.PDF_FILES (section_name, button_name, pdf_content) 
-            VALUES (:section_name, :button_name, :pdf_data)
+            INSERT INTO TRAINING_FILES.PDF_FILES (section_name, button_name, pdf_content, file_type) 
+            VALUES (:section_name, :button_name, :pdf_data, :file_type)
         """)
         try:
             self.conn.execute(query, {
                 "section_name": section_name,
                 "button_name": button_name,
                 "pdf_data": pdf_data,
+                "file_type": file_type
             })
         except Exception as e:
-            print(f"Error inserting PDF: {e}")
+            print(f"Error inserting file: {e}")
             self.conn.rollback()
             return False
         else:
@@ -78,18 +79,21 @@ class PDFManager:
 
     def get_pdf_content(self, section_name: str, button_name: str) -> Optional[bytes]:
         query = sa.text(f"""
-            SELECT pdf_content 
+            SELECT pdf_content, file_type 
             FROM TRAINING_FILES.PDF_FILES 
             WHERE section_name = :section_name AND button_name = :button_name
         """)
         result = self.conn.execute(query, {
                 "section_name": section_name,
                 "button_name": button_name
-            }).fetchone()
-        fetch_result = next((pdf_content for pdf_content in result or []), None)
-        base64_pdf = base64.b64encode(bytes(fetch_result)).decode('utf-8')
+            })
+        for file_content, file_type in result.fetchall():
+            if file_type == 'pdf':
+                base64_file = base64.b64encode(bytes(file_content)).decode('utf-8')
+            elif file_type == 'mp4':
+                base64_file = bytes(file_content)
 
-        return base64_pdf
+            return base64_file, file_type
 
     def get_button_dict(self) -> Dict[str, Dict[str, bytes]]:
         query = sa.text("SELECT section_name, button_name FROM TRAINING_FILES.PDF_FILES order by id asc")

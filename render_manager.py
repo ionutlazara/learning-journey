@@ -19,7 +19,7 @@ class RenderManager:
         template = self.env.get_template(template_name)
         return template.render(context)
 
-    def display_pdf(self, pdf_data: bytes, template: str):
+    def display_pdf(self, file_data: bytes, template: str):
         """Display PDF in an iframe with styling using a Jinja2 HTML template."""
-        html_content = self.render_template(template_name=template, pdf_data=pdf_data)
+        html_content = self.render_template(template_name=template, file_data=file_data)
         st.markdown(html_content, unsafe_allow_html=True)

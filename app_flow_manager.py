@@ -59,23 +59,27 @@ class AppManager:
         """Display the PDF content when a button is clicked."""
         if "button_clicked" in st.session_state:
             section, button = st.session_state['button_clicked']
-            pdf_data = get_cached_pdf(section, button)
-            if pdf_data:
-                self.render_manager.display_pdf(pdf_data, "pdf_container.html")
+            file_data, file_type = get_cached_pdf(section, button)
+            if file_data:
+                if file_type == 'pdf':
+                    self.render_manager.display_pdf(file_data, "pdf_container.html")
+                elif file_type == 'mp4':
+                    st.video(file_data)
             else:
-                st.write("No PDF content available for this section.")
+                st.write("No File content available for this section.")
 
     def upload_pdf(self):
         """Handle the upload PDF action."""
         st.subheader("Upload a New PDF")
         new_section = st.text_input("Section Name")
         new_button = st.text_input("Button Name")
-        pdf_file = st.file_uploader("Choose a PDF file", type=["pdf"])
+        pdf_file = st.file_uploader("Choose a File", type=["pdf", "mp4"])
 
         if st.button("Submit Upload"):
             if new_section and new_button and pdf_file:
                 pdf_data = pdf_file.getvalue()
-                success = self.pdf_manager.insert_pdf(new_section, new_button, pdf_data)
+                file_type = pdf_file.name.split('.')[-1]
+                success = self.pdf_manager.insert_pdf(new_section, new_button, pdf_data, file_type)
                 if success:
                     st.success("PDF uploaded successfully!")
                     st.session_state.page = 'main'
