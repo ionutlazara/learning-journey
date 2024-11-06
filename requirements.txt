@@ -1,5 +1,4 @@
-config
 jinja2
-python-configuration
 psycopg2
+sqlalchemy
 streamlit

@@ -1,7 +1,7 @@
 db_config = {
-   "dbname": "your_database",
-   "user": "your_username",
-   "password": "your_password",
+   "dbname": "LEARNING_JOURNEY",
+   "user": "admin",
+   "password": "admin",
    "host": "localhost",
    "port": 5432
 }
